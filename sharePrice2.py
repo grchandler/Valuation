@@ -11,6 +11,7 @@ Company class library (this file) for importing into other programs - also inclu
 import requests
 import pandas as pd
 import yfinance as yf
+import matplotlib.pyplot as plt
 
 
 class Company:
@@ -36,6 +37,23 @@ class Company:
         df = pd.DataFrame(free_cash_flow_data[::-1])
         print(f"\nHistorical FCFs:\n{df}")
         return df
+    
+    def plot_historical_fcf(self, df):
+       """
+       Plots the historical free cash flows from the provided DataFrame.
+
+       Args:
+           df (DataFrame): A DataFrame containing 'date' and 'freeCashFlow' columns.
+       """
+       plt.figure(figsize=(10, 6))
+       plt.plot(df['date'], df['freeCashFlow'], marker='o', label='Free Cash Flow', color='blue')
+       plt.title(f"Historical Free Cash Flows for {self.ticker}")
+       plt.xlabel("Date")
+       plt.ylabel("Free Cash Flow (USD)")
+       plt.xticks(rotation=45)
+       plt.grid(True, linestyle='--', alpha=0.7)
+       plt.legend()
+       plt.tight_layout()
 
     def calculate_avg_fcf_change(self, df):
         df['percent_change'] = df['freeCashFlow'].pct_change()
@@ -139,6 +157,7 @@ class Company:
     def run_analysis(self):
         # Step 1: Get Historical FCF
         df = self.get_historical_fcf()
+        self.plot_historical_fcf(df)
 
         # Step 2: Calculate Average FCF Change
         avg_fcf_change = self.calculate_avg_fcf_change(df)
@@ -167,6 +186,9 @@ class Company:
 
         # Step 10: Get 10 Year Treasury Yield
         self.get_10yr_treasury_yield()
+        
+        # Final Step: Ensure the plot remains open
+        plt.show()  # Blocking call to keep the plot open
 
 
 if __name__ == "__main__":
